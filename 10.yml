@@ -1,0 +1,69 @@
+---
+- name: Install Rancher, LDAP  and configure
+  hosts: canary
+  become: true
+
+  tasks:
+##################################################################################
+  - name: "Get information about installed packeges"
+    package_facts:
+     manager: "auto"
+
+  - name: "Massage if non-compliance"
+    debug:
+     msg: "The target host does not meet the requirements to run this playbook"
+    when: >
+          ansible_system != "Linux"
+          or ansible_distribution != "CentOS"
+          or ansible_distribution_version < "8"
+          or  ansible_python_version < "3"
+          or 'docker-ce' not in ansible_facts.packages
+          or ansible_memory_mb.real.total < 3000
+
+  - name: "Stopping when the playbook does not meet the requirements"
+    meta: end_play
+    when: >
+          ansible_system != "Linux"
+          and ansible_distribution != "CentOS"
+          and ansible_distribution_version < "8"
+          and  ansible_python_version < "3"
+          and 'docker-ce' not in ansible_facts.packages
+          or ansible_memory_mb.real.total < 3000
+##################################################################################
+
+#  - name: "Pull and run Docker image with Rancher 'Port Forwarding Does Not Work' "
+#    docker_container:
+#     name: Rancher
+#     image: rancher/rancher:v2.6.0
+#     state: started
+#     restart_policy: unless-stopped
+#     ports:
+#      - "88:80"
+#      - "443:443"
+
+  - name: "Pull and run Docker image with Rancher with 'Shell'"
+    shell: docker run -d --restart=unless-stopped -p 80:80 -p 443:443 --privileged rancher/rancher:v2.6.0
+    ignore_errors: yes
+
+
+  - name: "Pull and run Docker image with OpenLDAP"
+    docker_container:
+     name: OpenLDAP
+     image: bitnami/openldap:2.5
+     state: started
+     restart_policy: unless-stopped
+     env:
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: Pa55w.rd
+      LDAP_USERS: hillel
+      LDAP_PASSWORDS: hillel
+
+
+# docker run -d --restart=unless-stopped -p 80:80 -p 443:443 --privileged rancher/rancher
+# docker run --detach --rm --name openldap \
+#  --network my-network \
+#  --env LDAP_ADMIN_USERNAME=admin \
+#  --env LDAP_ADMIN_PASSWORD=adminpassword \
+#  --env LDAP_USERS=customuser \
+#  --env LDAP_PASSWORDS=custompassword \
+#  bitnami/openldap:latest
