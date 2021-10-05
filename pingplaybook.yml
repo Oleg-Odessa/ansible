@@ -1,0 +1,9 @@
+---
+- name: ping all_servers
+  hosts: linux_servers
+  become: yes
+
+  tasks:
+
+  - name: Ping
+    ping:

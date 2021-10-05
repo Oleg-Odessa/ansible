@@ -1,0 +1,2 @@
+[centos_servers]
+centos8-2	ansible_host=192.168.0.172

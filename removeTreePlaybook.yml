@@ -1,0 +1,9 @@
+---
+- name: Remove Packege Tree
+  hosts: linux_servers
+  become: yes
+
+  tasks:
+  - name: UnInstall Packege tree
+    package: name=tree state=absent
+

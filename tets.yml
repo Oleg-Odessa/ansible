@@ -1,0 +1,8 @@
+---
+- name: Install Rancher, LDAP  and configure
+  hosts: canary
+  become: true
+
+  tasks:
+  - debug:
+     var: ansible_memory_mb.real.total

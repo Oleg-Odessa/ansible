@@ -1,0 +1,3 @@
+---
+# vars file for dz10
+ldap_json: "{{ lookup('template', 'ldap_json.j2') }}"

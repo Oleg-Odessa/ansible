@@ -1,0 +1,20 @@
+[local]
+centos8-3       ansible_host=192.168.0.173	ansible_connection=local	 owner=Root
+
+[centos_servers]
+centos8-2	ansible_host=192.168.0.172	owner=CentUser
+
+[canary]
+centos8-4       ansible_host=192.168.0.174      owner=CanaryUser
+
+[debian_servers]
+debian10-2	ansible_host=192.168.0.162	owner=DebUser
+
+[linux_servers:children]
+centos_servers
+debian_servers
+canary
+
+[all_servers:children]
+linux_servers
+local

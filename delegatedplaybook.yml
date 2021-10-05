@@ -1,0 +1,49 @@
+---
+- name: Playbook for delegated
+  hosts: linux_servers
+  become: yes
+
+  vars:
+   mytext: "Privet Mir!"
+
+  tasks:
+  - name: Ping test
+    ping:
+
+  - name: Unregoster Server from Load Balancer
+    shell: echo This Server {{ inventory_hostname }} was deregistered from Load Balancer, node name is {{ ansible_nodename }} >> /home/log.txt
+    delegate_to: 127.0.0.1
+
+  - name: Update my Database
+    shell: echo UPDATING DATABASE COMMAND
+    run_once: yes
+
+  - name: Create File1
+    copy:
+     dest: /home/file1.txt
+     content: |
+       This is FialeN1
+       On ENGLISH Hello world!
+       On RUSSIAN {{ mytext }}
+    delegate_to: centos8-2
+
+  - name: Create File2
+    copy:
+     dest: /home/file2.txt
+     content: |
+      This is FialeN2
+      On ENGLISH Hello world!
+      On RUSSIAN {{ mytext }}
+
+  - name: Reboot my Servers
+    shell: sleep 3 && reboot now
+    async: 1
+    poll: 0
+
+  - name: Wait till my Servers will come Olnline
+    wait_for:
+     host: "{{ inventory_hostname }}"
+     state: started
+     delay: 5
+     timeout: 30
+    delegate_to: 127.0.0.1

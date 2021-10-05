@@ -1,0 +1,38 @@
+---
+- name: Errors Handling
+  hosts: linux_servers
+  any_errors_fatal: true
+  become: yes
+
+  tasks:
+###############
+  - name: Task Number
+    package: name=treee state=latest
+#    package: name=tree state=absent
+    ignore_errors: yes
+###############
+  - name: Task Number2
+    shell: echo Hello World!
+    register: results1
+    failed_when: results1.rc == 0
+#    failed_when: "'World' in results.stdout"
+    ignore_errors: yes
+###############
+  - debug:
+      var: results1
+###############
+  - name: Task Number3
+    shell: cat /home/user/myfile.txt
+    register: results2
+###############
+  - name: Task Number4
+    shell: echo Privet Mir 1!
+###############
+  - name: Task Number5
+    shell: echo Privet Mir 2!
+
+
+
+
+
+

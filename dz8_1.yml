@@ -1,0 +1,70 @@
+---
+- name: Install Docker, Docker-compose and Jenkins in docker conteiner
+  hosts: centos_servers
+  become: yes
+
+
+
+  tasks:
+
+  - name: Remove podman && buildah
+    package: name={{ item }} state=absent
+    with_items:
+      - podman
+      - buildah
+
+  - name: Install  yum-utils for add yum-config-manager
+    package: name=yum-utils state=present
+
+  - name: Add docker repository
+    shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+  - name: Install docker
+    package: name={{ item }} state=present
+    with_items:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+  - name: Start and Enabled Service docker
+    ansible.builtin.service:
+     name: docker
+     state: started
+     enabled: yes
+
+  - name: Download docker-compose
+    get_url:
+     url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+     dest: /usr/local/bin/docker-compose
+     mode: 'u+x,g+x'
+
+  - name: Create a symbolic link for docker-compose
+    ansible.builtin.file:
+     src: /usr/local/bin/docker-compose
+     dest: /usr/bin/docker-compose
+     state: link
+
+  - name: Reboot Server after docker installing
+    shell: sleep 3 && reboot now
+    async: 1
+    poll: 0
+
+  - name: Wait till my Servers will come Olnline
+    wait_for:
+     host: "{{ inventory_hostname }}"
+     state: started
+     delay: 5
+     timeout: 30
+    delegate_to: 127.0.0.1
+
+  - name: get docker version
+    shell: docker -v
+    register: version
+
+  - debug:
+     var: version.stdout
+
+  - name: Pull and run Docker image with Jenkins
+    shell: docker run -d --restart unless-stopped -p 8080:8080 -p 50000:50000  jenkins/jenkins:latest
+#    delegate_to: "{{ ansible_default_ipv4.address }}"
+    ignore_errors: yes

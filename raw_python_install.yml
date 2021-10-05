@@ -1,0 +1,8 @@
+---
+- name: RAW playbook
+  hosts: server_name
+#  gather_facts: no
+
+  tasks:
+  - name: Install Python whith RAW
+    raw: yum -y install python3

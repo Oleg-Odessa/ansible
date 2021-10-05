@@ -1,0 +1,14 @@
+---
+- name: Install Docker, Docker-compose and Jenkins in docker conteiner
+  hosts: centos_servers
+#canary
+#centos_servers
+  become: yes
+
+#  pre_tasks:
+#  - name: Install Python whith RAW
+#    raw: yum -y install python3
+
+  roles:
+   - install_docker_docker_compose
+   - install_jenkins

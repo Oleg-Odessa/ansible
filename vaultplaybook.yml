@@ -1,0 +1,27 @@
+---
+- name: Ansible Vault examle
+  hosts: linux_servers
+  become: yes
+
+  vars:
+   admin_password: vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          65663637386363616662656230396132343435613932383664643133623065373830626238616334
+          3839353339386134376162303939336333656266316134310a396238633362333535323837636131
+          64323261386362353361653733666635306537656132343339656236333135653163656666656138
+          6131633334363561630a333761623730326338363966363731636530623032373237613932363132
+          3531
+
+  tasks:
+  - name: Install Packege tree
+    package: name=tree state=latest
+
+  - name: Create Config File
+    copy:
+     dest: "/home/user/myconfig.conf"
+     content: |
+      port = 9092
+      log  = 7days
+      home = /opt/kafka/bin
+      user = root
+      password = {{ admin_password }}

@@ -1,0 +1,28 @@
+---
+- name: Remove Apache
+  hosts: linux_servers
+  become: yes
+
+  vars:
+    source_folder: ./MyWebSite2
+    distin_folder: /var/www/html
+
+  tasks:
+  - name: Check and Print LINUX Version
+    debug: var=ansible_os_family
+
+  - block: # ===== Block for RedHat =====
+     - name: Remove Apache Web Server for RedHat (HTTPD)
+       yum: name=httpd state=absent
+    when: ansible_os_family == "RedHat"
+
+
+  - block: # ===== Block for Debian =====
+     - name: Remove Apache Web Server for Debian (APACHE2)
+       apt: name=apache2 state=absent
+    when: ansible_os_family == "Debian"
+
+  - name: Clear /var/www/html Directore
+    file:
+      state: absent
+      path: /var/www/html/
