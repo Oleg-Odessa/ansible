@@ -1,0 +1,27 @@
+---
+- name: Import and Include PlayBook
+  hosts: linux_servers
+  become: yes
+
+  vars:
+   mytext: "Hello from Bank"
+
+  tasks:
+  - name: Ping test
+    ping:
+#######################
+  - name: Create Folders
+    include: create_folders.yml
+  - name: Create Files
+    include: create_files.yml #mytext="Hello from Home"
+#######################
+#  - name: Create Folders
+#    import: create_folders.yml
+#  - name: Create Files
+#    import: create_files.yml
+#######################
+#  - name: Create Folders
+#    include: create_folders.yml
+#  - name: Create Files
+#    include: create_files.yml   mytext="Hello from Home"
+#######################
